@@ -32,34 +32,25 @@ export interface Product {
 const AppImpl: React.SFC = () => {
   const [products, setProducts] = useState<Product[] | undefined>(undefined);
   const [totalPages, setTotalPages] = useState(100);
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const [isFetching, setIsFetching] = useState(false);
 
-  const fetchProducts = async (currentPage: number) => {
-    setCurrentPage((currentPage += 1));
-    if (currentPage <= totalPages) {
-      const url = `https://api.bestbuy.com/v1/products(search=oven&search=stainless&search=steel)?format=json&show=all&page=${currentPage}&apiKey=mPlbr5GXMVkagVgzwT7T2V5X`;
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const url = `https://api.bestbuy.com/v1/products(search=oven&search=stainless&search=steel)?format=json&show=all&page=1&apiKey=mPlbr5GXMVkagVgzwT7T2V5X`;
       const apiResponse = await fetch(url).then(response =>
         response.json().then((data: ApiData) => data)
       );
-      products
-        ? setProducts(products.concat(apiResponse.products))
-        : setProducts(apiResponse.products);
+      setProducts(apiResponse.products);
       setTotalPages(apiResponse.totalPages);
-      setCurrentPage(apiResponse.currentPage);
-      setIsFetching(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchProducts(currentPage);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    };
+    fetchProducts();
   }, []);
 
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  });
 
   const handleScroll = () => {
     if (
@@ -72,15 +63,32 @@ const AppImpl: React.SFC = () => {
 
   useEffect(() => {
     if (!isFetching) return;
-    fetchMoreListItems();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFetching]);
-
-  const fetchMoreListItems = () => {
-    setTimeout(() => {
-      fetchProducts(currentPage);
-    }, 300);
-  };
+    const fetchProducts = async () => {
+      let pageToFetch = currentPage;
+      pageToFetch = pageToFetch + 1;
+      if (currentPage <= totalPages) {
+        const url = `https://api.bestbuy.com/v1/products(search=oven&search=stainless&search=steel)?format=json&show=all&page=${pageToFetch}&apiKey=mPlbr5GXMVkagVgzwT7T2V5X`;
+        const apiResponse = await fetch(url)
+          .then(response => {
+            if (response.status !== 200)
+              throw new Error(
+                `HTTP request error, status = ${response.status}`
+              );
+            return response.json();
+          })
+          .then((data: ApiData) => {
+            setIsFetching(false);
+            setCurrentPage(pageToFetch);
+            return data;
+          })
+          .catch(error => console.error(error));
+        products &&
+          apiResponse &&
+          setProducts(products.concat(apiResponse.products));
+      }
+    };
+    fetchProducts();
+  }, [currentPage, products, totalPages, isFetching]);
 
   return (
     <div style={{ padding: "0.5rem" }}>
