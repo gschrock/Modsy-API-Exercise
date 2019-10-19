@@ -2,6 +2,9 @@ import React from "react";
 import { Spinner } from "react-bootstrap";
 import styled from "styled-components";
 
+/**
+ * A reusable loading spinner component.
+ */
 const LoadingSpinnerImpl: React.SFC = () => {
   return (
     <LoadSpinnerContainer>

@@ -7,6 +7,10 @@ interface Props {
   item: Product;
 }
 
+/**
+ * A reusable product card component that displays the
+ * desired details of an item.
+ */
 const ProductCardImpl: React.SFC<Props> = ({ item }) => {
   return (
     <StyledCard>
