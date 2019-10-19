@@ -1,4 +1,6 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+An exercise in hitting an api and displaying product results using an infinite scroll. Implemented with React hooks, TypeScript, and styled using Styled-Components and Bootstrap. This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+![](https://media.giphy.com/media/M9TTFvzXh493eaisOd/giphy.gif)
 
 ## Available Scripts
 
